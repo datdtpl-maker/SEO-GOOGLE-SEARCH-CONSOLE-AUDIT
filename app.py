@@ -16,8 +16,15 @@ from gsc_client import GSCClient
 from reporter import HTMLReporter
 
 def get_logo_base64():
-    """Đọc logo.jpg trong cùng thư mục dự án và chuyển sang Base64."""
-    logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logo.jpg")
+    """Đọc logo.jpg trong cùng thư mục chạy thực tế và chuyển sang Base64."""
+    if getattr(sys, 'frozen', False):
+        # Nếu đang chạy file .exe đóng gói
+        project_dir = os.path.dirname(sys.executable)
+    else:
+        # Nếu đang chạy script .py thông thường
+        project_dir = os.path.dirname(os.path.abspath(__file__))
+        
+    logo_path = os.path.join(project_dir, "logo.jpg")
     if os.path.exists(logo_path):
         try:
             with open(logo_path, "rb") as img_file:
@@ -26,6 +33,7 @@ def get_logo_base64():
         except Exception:
             pass
     return ""
+
 
 
 # HTML/CSS/JS cho giao diện Cấu hình (phong cách Glassmorphism)

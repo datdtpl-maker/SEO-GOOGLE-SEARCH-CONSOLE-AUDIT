@@ -33,7 +33,15 @@ class HTMLReporter:
 
         # Đọc và chuyển đổi logo sang Base64 cục bộ (nếu có)
         logo_b64 = ""
-        logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logo.jpg")
+        import sys
+        if getattr(sys, 'frozen', False):
+            # Nếu đang chạy file .exe đóng gói
+            project_dir = os.path.dirname(sys.executable)
+        else:
+            # Nếu đang chạy script .py thông thường
+            project_dir = os.path.dirname(os.path.abspath(__file__))
+            
+        logo_path = os.path.join(project_dir, "logo.jpg")
         if os.path.exists(logo_path):
             try:
                 with open(logo_path, "rb") as img_file:
