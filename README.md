@@ -38,7 +38,7 @@ Công cụ tự động quét lỗi SEO On-page kết hợp phân tích hiệu s
 
 ```text
 gsc_seo_audit/
-├── gui.py                     # Giao diện đồ họa (GUI) của công cụ chạy trực tiếp bằng Python
+├── app.py                     # Giao diện đồ họa (GUI) Hybrid Webview chạy bằng Python
 ├── run.py                     # File chạy chính phối hợp các module (Giao diện dòng lệnh - CLI)
 ├── config.py                  # Cấu hình dự án (URL, luồng quét, tên file báo cáo...)
 ├── crawler.py                 # Bộ thu thập dữ liệu (quét website và check SEO On-page)
@@ -105,7 +105,7 @@ pip install customtkinter
 ### Cách 2: Chạy Giao Diện Đồ Họa (GUI) Bằng Python
 Trong môi trường ảo của bạn, chạy lệnh sau:
 ```bash
-python gui.py
+python app.py
 ```
 Giao diện đồ họa tương tự như file `.exe` sẽ hiện lên giúp bạn thao tác cấu hình trực quan.
 

@@ -59,7 +59,7 @@ class SEOCrawler:
             self.visited_urls[cleaned_url] = {"status": "processing"}
 
 
-        # print(f"[Crawl] Đang quét: {cleaned_url}")
+        print(f"[Crawl] Đang quét: {cleaned_url}")
         
         try:
             response = requests.get(
