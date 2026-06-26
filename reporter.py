@@ -343,6 +343,12 @@ class HTMLReporter:
             cursor: pointer;
         }}
 
+        /* Khắc phục lỗi chữ trắng trên nền trắng khi bung menu dropdown */
+        .filter-select option {{
+            background-color: #161c2d;
+            color: #ffffff;
+        }}
+
         .table-wrapper {{
             width: 100%;
             overflow-x: auto;
