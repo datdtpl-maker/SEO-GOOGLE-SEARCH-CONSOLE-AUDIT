@@ -16,12 +16,24 @@ from gsc_client import GSCClient
 from reporter import HTMLReporter
 
 def get_logo_base64():
-    """Đọc logo.jpg trong cùng thư mục chạy thực tế và chuyển sang Base64."""
+    """Đọc logo.jpg từ các đường dẫn ưu tiên và chuyển sang Base64."""
+    # Ưu tiên 1: Tìm logo.jpg nằm bên cạnh file chạy thực tế (cho phép người dùng ghi đè logo bên ngoài)
     if getattr(sys, 'frozen', False):
-        # Nếu đang chạy file .exe đóng gói
-        project_dir = os.path.dirname(sys.executable)
+        exe_dir = os.path.dirname(sys.executable)
+        logo_path = os.path.join(exe_dir, "logo.jpg")
+        if os.path.exists(logo_path):
+            try:
+                with open(logo_path, "rb") as img_file:
+                    encoded = base64.b64encode(img_file.read()).decode('utf-8')
+                    return f"data:image/jpeg;base64,{encoded}"
+            except Exception:
+                pass
+
+    # Ưu tiên 2: Tìm logo.jpg được nhúng bên trong file .exe hoặc trong thư mục code
+    if getattr(sys, 'frozen', False):
+        # PyInstaller giải nén tài nguyên nhúng vào sys._MEIPASS
+        project_dir = sys._MEIPASS
     else:
-        # Nếu đang chạy script .py thông thường
         project_dir = os.path.dirname(os.path.abspath(__file__))
         
     logo_path = os.path.join(project_dir, "logo.jpg")
@@ -33,6 +45,7 @@ def get_logo_base64():
         except Exception:
             pass
     return ""
+
 
 
 
@@ -416,7 +429,7 @@ APP_UI_HTML = """<!DOCTYPE html>
                     const logoEl = document.getElementById('logo-img');
                     logoEl.src = res.logo_b64;
                     logoEl.style.display = 'block';
-                    document.getElementById('logo-text').innerText = 'KHẢI HOÀN SKINCARE';
+                    document.getElementById('logo-text').innerText = 'KHẢI HOÀN DERMA';
                 }
             });
         });
@@ -507,8 +520,7 @@ APP_UI_HTML = """<!DOCTYPE html>
                 const tabReport = document.getElementById('tab-btn-report');
                 tabReport.classList.remove('disabled');
                 
-                const reportUrl = "file:///" + resultPathOrError.replace(/\\\\/g, '/').replace(/\\\\\\\\/g, '/');
-                document.getElementById('report-iframe').src = reportUrl;
+                document.getElementById('report-iframe').src = resultPathOrError;
                 
                 // Chuyển hướng tab sang báo cáo
                 switchTab('iframe-panel');
@@ -638,8 +650,10 @@ class WebviewAPI:
             print(f"Báo cáo xuất tại: {report_abspath}")
             print("=" * 60 + "\n")
             
-            # Gửi thông tin về cho JS cập nhật UI
-            self.window.evaluate_js(f"scanFinished(true, {json.dumps(report_abspath)})")
+            # Gửi thông tin về cho JS cập nhật UI (Chuyển sang định dạng URI chuẩn hóa)
+            from pathlib import Path
+            report_uri = Path(report_abspath).as_uri()
+            self.window.evaluate_js(f"scanFinished(true, {json.dumps(report_uri)})")
 
         except Exception as e:
             print(f"\n[LỖI HỆ THỐNG] Đã xảy ra lỗi trong quá trình quét: {str(e)}")
@@ -653,11 +667,14 @@ def main():
     with open(ui_path, "w", encoding="utf-8") as f:
         f.write(APP_UI_HTML)
 
-    # 2. Cấu hình API và khởi tạo pywebview
+    # 2. Cấu hình API và khởi tạo pywebview (Chuyển đường dẫn sang URI chuẩn hóa cho Edge)
+    from pathlib import Path
+    ui_url = Path(ui_path).as_uri()
+
     api = WebviewAPI()
     window = webview.create_window(
         title="SEO Auditor & GSC Integration Dashboard",
-        url=f"file:///{ui_path}",
+        url=ui_url,
         width=1200,
         height=800,
         resizable=True,

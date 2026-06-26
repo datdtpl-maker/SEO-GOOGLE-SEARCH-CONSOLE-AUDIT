@@ -34,21 +34,35 @@ class HTMLReporter:
         # Đọc và chuyển đổi logo sang Base64 cục bộ (nếu có)
         logo_b64 = ""
         import sys
+        
+        # Ưu tiên 1: Tìm logo.jpg nằm bên cạnh file chạy thực tế (cho phép người dùng ghi đè logo bên ngoài)
         if getattr(sys, 'frozen', False):
-            # Nếu đang chạy file .exe đóng gói
-            project_dir = os.path.dirname(sys.executable)
-        else:
-            # Nếu đang chạy script .py thông thường
-            project_dir = os.path.dirname(os.path.abspath(__file__))
-            
-        logo_path = os.path.join(project_dir, "logo.jpg")
-        if os.path.exists(logo_path):
-            try:
-                with open(logo_path, "rb") as img_file:
-                    encoded = base64.b64encode(img_file.read()).decode('utf-8')
-                    logo_b64 = f"data:image/jpeg;base64,{encoded}"
-            except Exception:
-                pass
+            exe_dir = os.path.dirname(sys.executable)
+            logo_path = os.path.join(exe_dir, "logo.jpg")
+            if os.path.exists(logo_path):
+                try:
+                    with open(logo_path, "rb") as img_file:
+                        encoded = base64.b64encode(img_file.read()).decode('utf-8')
+                        logo_b64 = f"data:image/jpeg;base64,{encoded}"
+                except Exception:
+                    pass
+
+        # Ưu tiên 2: Tìm logo.jpg được nhúng bên trong file .exe hoặc trong thư mục code
+        if not logo_b64:
+            if getattr(sys, 'frozen', False):
+                # PyInstaller giải nén tài nguyên nhúng vào sys._MEIPASS
+                project_dir = sys._MEIPASS
+            else:
+                project_dir = os.path.dirname(os.path.abspath(__file__))
+                
+            logo_path = os.path.join(project_dir, "logo.jpg")
+            if os.path.exists(logo_path):
+                try:
+                    with open(logo_path, "rb") as img_file:
+                        encoded = base64.b64encode(img_file.read()).decode('utf-8')
+                        logo_b64 = f"data:image/jpeg;base64,{encoded}"
+                except Exception:
+                    pass
 
         # HTML Template
         html_content = f"""<!DOCTYPE html>
@@ -486,7 +500,7 @@ class HTMLReporter:
             <div style="display: flex; align-items: center; gap: 16px;">
                 {f'<img src="{logo_b64}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-blue);">' if logo_b64 else ''}
                 <div class="logo-section">
-                    <h1>{ "KHẢI HOÀN SKINCARE - SEO AUDIT" if logo_b64 else "SEO & GOOGLE SEARCH CONSOLE AUDIT" }</h1>
+                    <h1>{ "KHẢI HOÀN DERMA - SEO AUDIT" if logo_b64 else "SEO & GOOGLE SEARCH CONSOLE AUDIT" }</h1>
                     <p>Địa chỉ web: <a href="{self.site_url}" class="link-text" target="_blank">{self.site_url}</a></p>
                 </div>
             </div>
