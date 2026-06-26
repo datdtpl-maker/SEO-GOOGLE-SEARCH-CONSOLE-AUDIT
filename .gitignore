@@ -1,0 +1,22 @@
+# Google Cloud Service Account Credentials
+service-account.json
+
+# Generated HTML reports (tránh rò rỉ dữ liệu website thực tế)
+*.html
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables & virtual env
+.env
+.venv
+venv/
+ENV/
+
+# Editor / IDE configurations
+.vscode/
+.idea/
+.project
+.pydevproject
