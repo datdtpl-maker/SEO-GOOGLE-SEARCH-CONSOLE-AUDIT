@@ -1,10 +1,18 @@
 # SEO Auditor & Google Search Console Integration Tool
 
-Công cụ tự động quét lỗi SEO On-page kết hợp phân tích hiệu suất tìm kiếm từ **Google Search Console (GSC) API**. Sau khi chạy, công cụ sẽ xuất ra một báo cáo Dashboard HTML đơn lẻ với giao diện **Glassmorphism** cao cấp, trực quan và hiện đại, giúp bạn dễ dàng theo dõi sức khỏe website cũng như đối soát hiệu suất tìm kiếm thực tế của từng URL.
+Công cụ tự động quét lỗi SEO On-page kết hợp phân tích hiệu suất tìm kiếm từ **Google Search Console (GSC) API**. Dự án hỗ trợ cả giao diện dòng lệnh (CLI), giao diện đồ họa hiện đại (GUI) và file chạy độc lập `.exe` giúp bạn thực hiện kiểm tra dễ dàng bằng một cú nhấp chuột trên máy tính Windows.
 
 ---
 
 ## 🌟 Tính Năng Nổi Bật
+
+- **Giao Diện Đồ Họa Hiện Đại (GUI):**
+  - Giao diện Dark Mode đẹp mắt, hỗ trợ người dùng nhập Website URL, lựa chọn tệp key GSC qua cửa sổ chọn file của Windows (File Dialog), điều chỉnh nhanh số trang tối đa và số luồng quét bằng thanh trượt (Slider).
+  - Có khung hiển thị tiến trình (Log Console) trực tiếp thời gian thực, giúp bạn nắm bắt tức thì quá trình quét.
+  - Hỗ trợ nút **Mở Báo Cáo HTML (Open Report)** để mở ngay dashboard kết quả trên trình duyệt sau khi quét xong.
+
+- **Đóng Gói File Chạy Độc Lập (.exe):**
+  - Tích hợp tệp `SEO_GSC_Auditor.exe` trong thư mục `dist/` chạy trực tiếp trên Windows mà không cần cài đặt Python hay bất kỳ thư viện bổ sung nào.
 
 - **Bộ Quét Website Đa Luồng (Multithreaded Crawler):**
   - Tự động thu thập và phân tích toàn bộ các liên kết nội bộ (Internal Links).
@@ -18,7 +26,7 @@ Công cụ tự động quét lỗi SEO On-page kết hợp phân tích hiệu s
 
 - **Báo Cáo Dashboard Glassmorphism Đẹp Mắt:**
   - Báo cáo được xuất ra dưới dạng **một file HTML duy nhất** dễ dàng chia sẻ.
-  - Giao diện thiết kế theo phong cách Glassmorphism sang trọng, hỗ trợ Responsive đầy đủ trên cả điện thoại và máy tính.
+  - Giao diện thiết kế theo phong cách Glassmorphism sang trọng, hỗ trợ Responsive đầy đủ.
   - Biểu đồ thống kê trực quan, các tab lọc nhanh lỗi 404, lỗi SEO On-page giúp dễ dàng khoanh vùng các trang cần tối ưu.
 
 - **Chế Độ Tạo Dữ Liệu Mẫu (Offline Sample Mode):**
@@ -30,25 +38,26 @@ Công cụ tự động quét lỗi SEO On-page kết hợp phân tích hiệu s
 
 ```text
 gsc_seo_audit/
+├── gui.py                     # Giao diện đồ họa (GUI) của công cụ chạy trực tiếp bằng Python
+├── run.py                     # File chạy chính phối hợp các module (Giao diện dòng lệnh - CLI)
 ├── config.py                  # Cấu hình dự án (URL, luồng quét, tên file báo cáo...)
 ├── crawler.py                 # Bộ thu thập dữ liệu (quét website và check SEO On-page)
 ├── gsc_client.py              # Kết nối và tải dữ liệu từ Google Search Console API
 ├── reporter.py                # Xử lý dữ liệu và xuất báo cáo Dashboard HTML
-├── run.py                     # File chạy chính phối hợp các module
 ├── generate_sample_data.py    # Kịch bản sinh dữ liệu mẫu để chạy thử nghiệm báo cáo
 ├── requirements.txt           # Danh sách thư viện Python cần cài đặt
-├── .gitignore                 # Cấu hình loại bỏ tệp nhạy cảm khi đưa lên Git
-└── README.md                  # Hướng dẫn sử dụng này
+├── .gitignore                 # Cấu hình loại bỏ tệp nhạy cảm và file build khi đưa lên Git
+├── README.md                  # Hướng dẫn sử dụng này
+└── dist/
+    └── SEO_GSC_Auditor.exe    # Ứng dụng chạy độc lập trên Windows (chạy ngay không cần cài đặt gì thêm)
 ```
 
 ---
 
-## 🛠️ Hướng Dẫn Cài Đặt & Cấu Hình
+## 🛠️ Hướng Dẫn Cài Đặt & Chạy Bằng Mã Nguồn Python
 
 ### 1. Chuẩn bị Môi trường
-Dự án yêu cầu cài đặt **Python 3.8** trở lên. 
-
-Thực hiện các bước sau tại thư mục dự án để thiết lập:
+Dự án yêu cầu cài đặt **Python 3.8** trở lên. Thực hiện thiết lập môi trường:
 
 ```bash
 # 1. Tạo môi trường ảo (Khuyến nghị)
@@ -60,8 +69,9 @@ python -m venv venv
 # Trên macOS/Linux:
 source venv/bin/activate
 
-# 3. Cài đặt các thư viện phụ thuộc
+# 3. Cài đặt các thư viện phụ thuộc (bao gồm cả customtkinter phục vụ GUI)
 pip install -r requirements.txt
+pip install customtkinter
 ```
 
 ### 2. Cấu Hình Google Search Console API (Service Account)
@@ -69,62 +79,54 @@ pip install -r requirements.txt
 
 1. **Tạo Dự Án & Bật API:**
    - Truy cập [Google Cloud Console](https://console.cloud.google.com/).
-   - Tạo một dự án mới hoặc chọn dự án hiện tại.
-   - Đi tới mục **API & Services > Library**, tìm kiếm và bật **Google Search Console API**.
-
+   - Tạo dự án mới và bật **Google Search Console API**.
 2. **Tạo Service Account & Tải Key:**
-   - Đi tới mục **IAM & Admin > Service Accounts**.
-   - Nhấp vào **Create Service Account**, nhập tên và hoàn thành.
-   - Nhấp vào Service Account vừa tạo, chọn tab **Keys**, chọn **Add Key > Create new key** dạng **JSON**.
-   - Tệp khóa JSON sẽ được tự động tải về máy của bạn.
-
-3. **Cấu Hình Khóa Trong Dự Án:**
-   - Đổi tên tệp khóa JSON đã tải về thành `service-account.json`.
-   - Di chuyển tệp này vào thư mục gốc của dự án `gsc_seo_audit/` (tệp này đã được cấu hình trong `.gitignore` để tránh bị lộ ra công cộng).
-
-4. **Cấp Quyền Đọc trên Google Search Console:**
-   - Mở file `service-account.json` của bạn và sao chép địa chỉ email của Service Account (có dạng: `tên-account@dự-án.iam.gserviceaccount.com`).
-   - Truy cập vào trang quản trị [Google Search Console](https://search.google.com/search-console).
-   - Chọn trang web (Property) của bạn.
-   - Đi tới **Settings > Users and permissions > Add user**.
-   - Dán địa chỉ email Service Account vừa copy vào, chọn quyền **Full** hoặc **Restricted** (chỉ cần quyền đọc dữ liệu hiệu suất) rồi lưu lại.
+   - Đi tới mục **IAM & Admin > Service Accounts > Create Service Account**.
+   - Sau khi tạo, nhấn vào Service Account đó, chọn tab **Keys > Add Key > Create new key** dạng **JSON**.
+   - Tệp khóa JSON tải về máy hãy đổi tên thành `service-account.json` và di chuyển vào thư mục gốc của dự án (tệp này được bỏ qua trong `.gitignore` để bảo mật).
+3. **Cấp Quyền trên Google Search Console:**
+   - Copy địa chỉ email của Service Account (dạng: `tên-account@dự-án.iam.gserviceaccount.com`).
+   - Vào [Google Search Console](https://search.google.com/search-console) chọn Property của bạn.
+   - Đi tới **Settings > Users and permissions > Add user**, dán email vào và cấp quyền đọc (Viewer/Full).
 
 ---
 
 ## 🚀 Hướng Dẫn Sử Dụng
 
-### Bước 1: Điều Chỉnh Cấu Hình
-Mở file `config.py` và cập nhật các thông số cho phù hợp với website của bạn:
-```python
-# Cấu hình website cần quét (Lưu ý: Domain phải khớp chính xác với Property trên GSC)
-SITE_URL = "https://example.com/"
+### Cách 1: Sử Dụng Ứng Dụng File Chạy Độc Lập `.exe` (Khuyên dùng cho người dùng cuối)
+1. Truy cập vào thư mục `dist/` và nhấp đúp chuột vào file `SEO_GSC_Auditor.exe` để mở ứng dụng.
+2. Trên giao diện hiện lên:
+   * **Website URL:** Nhập trang web bạn muốn quét.
+   * **Service Account Key:** Bấm nút **Browse...** để chọn file khóa `service-account.json` bạn đã chuẩn bị.
+   * **Sliders:** Kéo chỉnh số trang tối đa và số luồng quét.
+   * Bấm **Bắt đầu quét SEO & GSC (Start Audit)** để chương trình tự động chạy.
+3. Khi hoàn tất, một thông báo thành công xuất hiện và chương trình sẽ tự động mở báo cáo `seo_audit_report.html` trên trình duyệt web của bạn.
 
-# Số trang tối đa quét để tránh quá tải cho hosting
-MAX_CRAWL_PAGES = 500
-
-# Số luồng quét đồng thời
-CRAWL_THREAD_COUNT = 5
+### Cách 2: Chạy Giao Diện Đồ Họa (GUI) Bằng Python
+Trong môi trường ảo của bạn, chạy lệnh sau:
+```bash
+python gui.py
 ```
+Giao diện đồ họa tương tự như file `.exe` sẽ hiện lên giúp bạn thao tác cấu hình trực quan.
 
-### Bước 2: Chạy Công Cụ
-Kích hoạt môi trường ảo và chạy lệnh sau để bắt đầu quét toàn bộ và tích hợp dữ liệu GSC:
+### Cách 3: Chạy Giao Diện Dòng Lệnh (CLI)
+Cấu hình các thông số trong file `config.py` sau đó chạy lệnh:
 ```bash
 python run.py
 ```
-Sau khi tiến trình hoàn tất, báo cáo HTML mang tên `seo_audit_report.html` sẽ xuất hiện ở thư mục gốc. Bạn chỉ cần nhấp đúp để mở xem trên trình duyệt.
 
-### Bước 3 (Tùy chọn): Chạy Thử Với Dữ Liệu Giả Lập
-Nếu chưa cấu hình tài khoản GSC nhưng muốn kiểm tra ngay giao diện báo cáo HTML, bạn có thể chạy kịch bản tạo dữ liệu mẫu:
+### Chạy Thử Với Dữ Liệu Giả Lập (Không cần kết nối API GSC)
+Để xem trước giao diện báo cáo Dashboard HTML mà không cần chuẩn bị API GSC, hãy chạy:
 ```bash
 python generate_sample_data.py
 ```
-Chương trình sẽ tự động tạo file `seo_audit_report.html` chứa dữ liệu SEO giả lập kết hợp biểu đồ GSC mẫu để bạn xem trước giao diện.
+File báo cáo demo `seo_audit_report.html` sẽ tự động được sinh ra và mở trên trình duyệt.
 
 ---
 
 ## 🔒 Cam Kết Bảo Mật
-*   Tệp `service-account.json` chứa Private Key quản lý truy cập API của bạn **tuyệt đối không được đưa lên các dịch vụ lưu trữ mã nguồn mở công cộng** (như GitHub, GitLab).
-*   File `.gitignore` đi kèm dự án đã loại trừ tệp khóa này cùng với các file HTML kết quả nhằm tránh rò rỉ dữ liệu vận hành thực tế của trang web.
+*   Tệp `service-account.json` chứa Private Key quản lý truy cập API của bạn **tuyệt đối không được đưa lên các dịch vụ lưu trữ mã nguồn mở công cộng** (như GitHub).
+*   File `.gitignore` đi kèm dự án đã loại trừ tệp khóa này cùng với các thư mục build tạm, file `.exe` kết quả và các file HTML kết quả nhằm tránh rò rỉ dữ liệu vận hành thực tế của trang web.
 
 ---
 

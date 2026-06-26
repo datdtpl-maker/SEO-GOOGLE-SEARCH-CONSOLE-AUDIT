@@ -20,3 +20,9 @@ ENV/
 .idea/
 .project
 .pydevproject
+
+# PyInstaller build artifacts
+build/
+dist/
+*.spec
+
