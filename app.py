@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import json
+import base64
 import threading
 import queue
 import webbrowser
@@ -13,6 +14,19 @@ import config
 from crawler import SEOCrawler
 from gsc_client import GSCClient
 from reporter import HTMLReporter
+
+def get_logo_base64():
+    """Đọc logo.jpg trong cùng thư mục dự án và chuyển sang Base64."""
+    logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logo.jpg")
+    if os.path.exists(logo_path):
+        try:
+            with open(logo_path, "rb") as img_file:
+                encoded = base64.b64encode(img_file.read()).decode('utf-8')
+                return f"data:image/jpeg;base64,{encoded}"
+        except Exception:
+            pass
+    return ""
+
 
 # HTML/CSS/JS cho giao diện Cấu hình (phong cách Glassmorphism)
 APP_UI_HTML = """<!DOCTYPE html>
@@ -307,7 +321,10 @@ APP_UI_HTML = """<!DOCTYPE html>
 
     <!-- Tab Bar -->
     <div class="navbar">
-        <div class="logo">SEO AUDITOR & GSC</div>
+        <div class="logo" style="display: flex; align-items: center; gap: 10px;">
+            <img id="logo-img" src="" style="width: 32px; height: 32px; border-radius: 50%; display: none; object-fit: cover; border: 1.5px solid var(--primary);">
+            <span id="logo-text">SEO AUDITOR & GSC</span>
+        </div>
         <div class="nav-links">
             <div id="tab-btn-config" class="nav-tab active" onclick="switchTab('config-panel')">Cấu hình & Quét</div>
             <div id="tab-btn-report" class="nav-tab disabled" onclick="switchTab('iframe-panel')">Báo cáo kết quả</div>
@@ -386,6 +403,13 @@ APP_UI_HTML = """<!DOCTYPE html>
                 
                 document.getElementById('threads').value = res.threads;
                 document.getElementById('threads-val').innerText = res.threads + " luồng";
+                
+                if (res.logo_b64) {
+                    const logoEl = document.getElementById('logo-img');
+                    logoEl.src = res.logo_b64;
+                    logoEl.style.display = 'block';
+                    document.getElementById('logo-text').innerText = 'KHẢI HOÀN SKINCARE';
+                }
             });
         });
 
@@ -512,11 +536,13 @@ class WebviewAPI:
 
     def get_initial_config(self):
         """Trả về các cấu hình mặc định từ config.py."""
+        logo_b64 = get_logo_base64()
         return {
             "site_url": config.SITE_URL,
             "credentials_file": os.path.abspath(config.CREDENTIALS_FILE) if os.path.exists(config.CREDENTIALS_FILE) else config.CREDENTIALS_FILE,
             "max_pages": config.MAX_CRAWL_PAGES,
-            "threads": config.CRAWL_THREAD_COUNT
+            "threads": config.CRAWL_THREAD_COUNT,
+            "logo_b64": logo_b64
         }
 
     def browse_json(self):
@@ -624,8 +650,8 @@ def main():
     window = webview.create_window(
         title="SEO Auditor & GSC Integration Dashboard",
         url=f"file:///{ui_path}",
-        width=950,
-        height=720,
+        width=1200,
+        height=800,
         resizable=True,
         js_api=api
     )

@@ -1,5 +1,6 @@
 import os
 import json
+import base64
 from datetime import datetime
 
 class HTMLReporter:
@@ -23,12 +24,23 @@ class HTMLReporter:
         # GSC Data
         has_gsc = gsc_data is not None
         gsc_pages = gsc_data.get("pages", {}) if has_gsc else {}
-        gsc_queries = gsc_data.get("queries", []) if has_gsc else []
+        gsc_queries = gsc_data.get("queries", []) if has_gsc else {}
         gsc_sitemaps = gsc_data.get("sitemaps", []) if has_gsc else []
 
         total_clicks = sum(p.get("clicks", 0) for p in gsc_pages.values()) if has_gsc else 0
         total_impressions = sum(p.get("impressions", 0) for p in gsc_pages.values()) if has_gsc else 0
         avg_ctr = round(sum(p.get("ctr", 0) for p in gsc_pages.values()) / max(len(gsc_pages), 1), 2) if has_gsc else 0
+
+        # Đọc và chuyển đổi logo sang Base64 cục bộ (nếu có)
+        logo_b64 = ""
+        logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logo.jpg")
+        if os.path.exists(logo_path):
+            try:
+                with open(logo_path, "rb") as img_file:
+                    encoded = base64.b64encode(img_file.read()).decode('utf-8')
+                    logo_b64 = f"data:image/jpeg;base64,{encoded}"
+            except Exception:
+                pass
 
         # HTML Template
         html_content = f"""<!DOCTYPE html>
@@ -78,7 +90,8 @@ class HTMLReporter:
         }}
 
         .container {{
-            max-width: 1400px;
+            width: 96%;
+            max-width: 1600px;
             margin: 0 auto;
         }}
 
@@ -96,7 +109,7 @@ class HTMLReporter:
         }}
 
         .logo-section h1 {{
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 800;
             background: linear-gradient(135deg, #60a5fa, #c084fc);
             -webkit-background-clip: text;
@@ -108,6 +121,7 @@ class HTMLReporter:
             color: var(--text-secondary);
             margin-top: 4px;
         }}
+
 
         .time-badge {{
             background: rgba(255, 255, 255, 0.05);
@@ -339,6 +353,25 @@ class HTMLReporter:
             white-space: nowrap;
         }}
 
+        /* Đảm bảo cột H1 và Alt không bị mất chữ */
+        th:nth-child(4), td:nth-child(4) {{
+            width: 130px;
+            min-width: 130px;
+            text-align: center;
+        }}
+
+        th:nth-child(5), td:nth-child(5) {{
+            width: 160px;
+            min-width: 160px;
+            text-align: center;
+        }}
+
+        td:nth-child(4) .badge, td:nth-child(5) .badge {{
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+        }}
+
         tr:hover td {{
             background: rgba(255, 255, 255, 0.01);
         }}
@@ -441,10 +474,13 @@ class HTMLReporter:
 <body>
     <div class="container">
         <!-- Header -->
-        <header>
-            <div class="logo-section">
-                <h1>SEO & GOOGLE SEARCH CONSOLE AUDIT</h1>
-                <p>Địa chỉ web: <a href="{self.site_url}" class="link-text" target="_blank">{self.site_url}</a></p>
+        <header style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                {f'<img src="{logo_b64}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-blue);">' if logo_b64 else ''}
+                <div class="logo-section">
+                    <h1>{ "KHẢI HOÀN SKINCARE - SEO AUDIT" if logo_b64 else "SEO & GOOGLE SEARCH CONSOLE AUDIT" }</h1>
+                    <p>Địa chỉ web: <a href="{self.site_url}" class="link-text" target="_blank">{self.site_url}</a></p>
+                </div>
             </div>
             <div class="time-badge">
                 <i class="fa-regular fa-clock"></i> Báo cáo xuất lúc: {datetime.now().strftime("%d/%m/%Y %H:%M:%S")}
